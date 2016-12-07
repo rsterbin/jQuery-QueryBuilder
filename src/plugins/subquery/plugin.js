@@ -14,6 +14,8 @@ QueryBuilder.define('subquery', function(options) {
         self.filters.forEach(function(filter, i) {
             if ('subquery' in filter) {
                 self.filters[i].input = self.createSubquery;
+                self.filters[i].validation = { callback: self.validateSubquery };
+                self.filters[i].valueGetter = self.getSubqueryValue;
             }
         }, self);
     });
@@ -24,7 +26,6 @@ QueryBuilder.define('subquery', function(options) {
         self.initSubquery(rule);
     });
 
-}, {
 });
 
 QueryBuilder.extend({
@@ -54,17 +55,50 @@ QueryBuilder.extend({
     /**
      * Initializes the subquery
      * @param rule {Rule}
-     * @return {string}
      */
     initSubquery: function(rule) {
         if (!('subquery_id' in rule)) {
-            Utils.error('subquery', 'Subquery id missing in "{0}"', rule.id);
+            Utils.error('subquery', 'Subquery id missing in "{0}" on initSubquery', rule.id);
         }
         rule.$el.addClass('has-subquery');
         var opts = $.extendext(true, 'replace', {}, rule.filter.subquery);
         var $b = $('#' + rule.subquery_id);
         $b.attr('data-subquery', rule.subquery_id);
         $b.queryBuilder(opts);
+    },
+
+    /**
+     * Validates the subquery
+     * @param rule {Rule}
+     * @return {boolean}
+     */
+    validateSubquery: function(value, rule) {
+        if (!('subquery_id' in rule)) {
+            console.log(rule);
+            Utils.error('subquery', 'Subquery id missing in "{0}" on validateSubquery', rule.id);
+        }
+        var $b = $('#' + rule.subquery_id);
+        if ($b.queryBuilder('validate')) {
+            return true;
+        }
+        else {
+            return [ 'subquery_invalid' ];
+        }
+    },
+
+    /**
+     * Gets the subquery value
+     * @param rule {Rule}
+     * @param options {object}
+     * @return {object}
+     */
+    getSubqueryValue: function(rule, opts) {
+        if (!('subquery_id' in rule)) {
+            Utils.error('subquery', 'Subquery id missing in "{0}" on getSubqueryValue', rule.id);
+        }
+        var $b = $('#' + rule.subquery_id);
+        opts = $.extend({ validate: false }, opts);
+        return $b.queryBuilder('getRules', opts);
     }
 
 });

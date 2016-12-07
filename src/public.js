@@ -130,14 +130,16 @@ QueryBuilder.prototype.validate = function() {
  * Get an object representing current rules
  * @param {object} options
  *      - get_flags: false[default] | true(only changes from default flags) | 'all'
+ *      - validate: true[default] | false(skip validation)
  * @return {object}
  */
 QueryBuilder.prototype.getRules = function(options) {
     options = $.extend({
-        get_flags: false
+        get_flags: false,
+        validate: true
     }, options);
 
-    if (!this.validate()) {
+    if (options.validate && !this.validate()) {
         return {};
     }
 
