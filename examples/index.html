@@ -132,6 +132,7 @@ var options = {
   },
 
   plugins: {
+    'subquery': null,
     'bt-tooltip-errors': { delay: 100},
     'sortable': null,
     'filter-description': { mode: 'bootbox' },
@@ -403,6 +404,29 @@ var options = {
         rule.$el.find('[name=coord_1]').val(val[0]).trigger('change');
         rule.$el.find('[name=coord_2]').val(val[1]);
       }
+    }
+  }, {
+    id: "subscriptions",
+    label: "Subscriptions",
+    subquery: {
+     default_filter: 'name',
+     display_empty_filter: false,
+     filters: [{
+        id: "name",
+        type: "string",
+        label: "Name"
+      }, {
+        id: "status",
+        type: "string",
+        label: "Status",
+        input: "select",
+        multiple: true,
+        values: {
+          ac: "Active",
+          in: "Inactive",
+          tr: "Terminated"
+        }
+      }]
     }
   }]
 };
