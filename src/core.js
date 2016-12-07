@@ -238,48 +238,55 @@ QueryBuilder.prototype.bindEvents = function() {
     var self = this;
 
     // group condition change
-    this.$el.on('change.queryBuilder', Selectors.group_condition, function() {
+    this.$el.on('change.queryBuilder', Selectors.group_condition, function(e) {
         if ($(this).is(':checked')) {
             var $group = $(this).closest(Selectors.group_container);
             Model($group).condition = $(this).val();
         }
+        e.stopPropagation();
     });
 
     // rule filter change
-    this.$el.on('change.queryBuilder', Selectors.rule_filter, function() {
+    this.$el.on('change.queryBuilder', Selectors.rule_filter, function(e) {
         var $rule = $(this).closest(Selectors.rule_container);
         Model($rule).filter = self.getFilterById($(this).val());
+        e.stopPropagation();
     });
 
     // rule operator change
-    this.$el.on('change.queryBuilder', Selectors.rule_operator, function() {
+    this.$el.on('change.queryBuilder', Selectors.rule_operator, function(e) {
         var $rule = $(this).closest(Selectors.rule_container);
         Model($rule).operator = self.getOperatorByType($(this).val());
+        e.stopPropagation();
     });
 
     // add rule button
-    this.$el.on('click.queryBuilder', Selectors.add_rule, function() {
+    this.$el.on('click.queryBuilder', Selectors.add_rule, function(e) {
         var $group = $(this).closest(Selectors.group_container);
         self.addRule(Model($group));
+        e.stopPropagation();
     });
 
     // delete rule button
-    this.$el.on('click.queryBuilder', Selectors.delete_rule, function() {
+    this.$el.on('click.queryBuilder', Selectors.delete_rule, function(e) {
         var $rule = $(this).closest(Selectors.rule_container);
         self.deleteRule(Model($rule));
+        e.stopPropagation();
     });
 
     if (this.settings.allow_groups !== 0) {
         // add group button
-        this.$el.on('click.queryBuilder', Selectors.add_group, function() {
+        this.$el.on('click.queryBuilder', Selectors.add_group, function(e) {
             var $group = $(this).closest(Selectors.group_container);
             self.addGroup(Model($group));
+            e.stopPropagation();
         });
 
         // delete group button
-        this.$el.on('click.queryBuilder', Selectors.delete_group, function() {
+        this.$el.on('click.queryBuilder', Selectors.delete_group, function(e) {
             var $group = $(this).closest(Selectors.group_container);
             self.deleteGroup(Model($group));
+            e.stopPropagation();
         });
     }
 
