@@ -61,13 +61,10 @@ QueryBuilder.extend({
             Utils.error('subquery', 'Subquery id missing in "{0}"', rule.id);
         }
         rule.$el.addClass('has-subquery');
-        var opts = {};
-        if ('subquery_opts' in rule) {
-            opts = rule.subquery_opts;
-        } else {
-            opts = $.extendext(true, 'replace', this.settings, rule.filter.subquery);
-        }
-        $('#' + rule.subquery_id).queryBuilder(opts);
+        var opts = $.extendext(true, 'replace', {}, rule.filter.subquery);
+        var $b = $('#' + rule.subquery_id);
+        $b.attr('data-subquery', rule.subquery_id);
+        $b.queryBuilder(opts);
     }
 
 });
