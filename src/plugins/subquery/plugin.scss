@@ -1,8 +1,17 @@
+$section-background-color: rgba(196, 173, 237, .5) !default;
+$section-border-color: #AD92DB !default;
+$section-border: 1px solid $section-border-color !default;
+
 .query-builder {
   .rule-container.has-subquery > .rule-value-container {
     display: block;
     border: none;
     margin: 5px 0;
+  }
+
+  .rule-container.has-subquery {
+    border: $section-border;
+    background: $section-background-color;
   }
 }
 
