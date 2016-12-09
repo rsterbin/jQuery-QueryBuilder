@@ -54,6 +54,22 @@ $(function () {
         );
     });
 
+    QUnit.test('Check subquery operators', function (assert) {
+        $b.queryBuilder({
+            filters: subquery_filters,
+            plugins: ['subquery']
+        });
+
+        $('[name=builder_rule_0_filter]').val('subscriptions').trigger('change');
+
+        assert.optionsMatch(
+            $('#builder_rule_0 [name$=_operator]').first().find('option'),
+            [ 'equal', 'not_equal', 'in', 'not_in', 'is_empty', 'is_not_empty', 'is_null', 'is_not_null' ],
+            '"subscriptions" subquery filter should by default have only the subquery operators'
+        );
+
+    });
+
     var subquery_filters = [{
         id: "subscriptions",
         label: "Subscriptions",

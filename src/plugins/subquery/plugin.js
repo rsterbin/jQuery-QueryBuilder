@@ -5,14 +5,6 @@
 
 Selectors.subquery_container = '.rules-subquery-container';
 QueryBuilder.types['subquery'] = 'subquery';
-QueryBuilder.OPERATORS['equal'].apply_to.push('subquery');
-QueryBuilder.OPERATORS['not_equal'].apply_to.push('subquery');
-QueryBuilder.OPERATORS['in'].apply_to.push('subquery');
-QueryBuilder.OPERATORS['not_in'].apply_to.push('subquery');
-QueryBuilder.OPERATORS['is_empty'].apply_to.push('subquery');
-QueryBuilder.OPERATORS['is_not_empty'].apply_to.push('subquery');
-QueryBuilder.OPERATORS['is_null'].apply_to.push('subquery');
-QueryBuilder.OPERATORS['is_not_null'].apply_to.push('subquery');
 
 QueryBuilder.define('subquery', function(options) {
     this.status.subquery_id = 0;
@@ -20,6 +12,7 @@ QueryBuilder.define('subquery', function(options) {
     // Set the appropriate filter config options for subqueries
     this.on('afterInit', function(e, node) {
         var self = e.builder;
+        var ok_operators = [ 'equal', 'not_equal', 'in', 'not_in', 'is_empty', 'is_not_empty', 'is_null', 'is_not_null' ];
         self.filters.forEach(function(filter, i) {
             if ('subquery' in filter) {
                 self.filters[i].type = 'subquery';
@@ -27,8 +20,19 @@ QueryBuilder.define('subquery', function(options) {
                 self.filters[i].validation = { callback: self.validateSubquery };
                 self.filters[i].valueGetter = self.getSubqueryValue;
                 self.filters[i].valueSetter = self.setSubqueryValue;
+                /*
+                if (!('operators' in filter)) {
+                    self.filters[i].operators = ok_operators;
+                }
+                */
             }
         }, self);
+        for (var i = 0; i < self.operators.length; ++i) {
+            if (ok_operators.indexOf(self.operators[i].type) == -1) {
+                continue;
+            }
+            self.operators[i].apply_to.push('subquery');
+        }
     });
 
     // Initialize the subquery
