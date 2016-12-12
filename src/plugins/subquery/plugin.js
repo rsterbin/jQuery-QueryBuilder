@@ -20,11 +20,6 @@ QueryBuilder.define('subquery', function(options) {
                 self.filters[i].validation = { callback: self.validateSubquery };
                 self.filters[i].valueGetter = self.getSubqueryValue;
                 self.filters[i].valueSetter = self.setSubqueryValue;
-                /*
-                if (!('operators' in filter)) {
-                    self.filters[i].operators = ok_operators;
-                }
-                */
             }
         }, self);
         for (var i = 0; i < self.operators.length; ++i) {
@@ -38,12 +33,16 @@ QueryBuilder.define('subquery', function(options) {
     // Initialize the subquery
     this.on('afterCreateRuleInput', function(e, rule) {
         var self = e.builder;
-        self.initSubquery(rule);
+        if (rule.filter.type == 'subquery') {
+            self.initSubquery(rule);
+        }
     });
 
     // Drop the custom input function from json
     this.on('ruleToJson.filter', function(e, rule) {
-        delete e.value.input;
+        if (rule.filter.type == 'subquery') {
+            delete e.value.input;
+        }
     });
 
 });
