@@ -257,11 +257,12 @@ QueryBuilder.extend({
                     }
 
                     if (ope.nb_inputs !== 0) {
-                        if (!(rule.value instanceof Array)) {
-                            rule.value = [rule.value];
+                        var values = self.change('ruleToSQLValues', rule.value, rule);
+                        if (!(values instanceof Array)) {
+                            values = [values];
                         }
 
-                        rule.value.forEach(function(v, i) {
+                        values.forEach(function(v, i) {
                             if (i > 0) {
                                 value+= sql.sep;
                             }

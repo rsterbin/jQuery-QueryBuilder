@@ -67,7 +67,30 @@ $(function () {
             [ 'equal', 'not_equal', 'in', 'not_in', 'is_empty', 'is_not_empty', 'is_null', 'is_not_null' ],
             '"subscriptions" subquery filter should by default have only the subquery operators'
         );
+    });
 
+    QUnit.test('Get and set SQL for subqueries', function (assert) {
+        $b.queryBuilder({
+            filters: subquery_filters,
+            rules: subquery_rules,
+            plugins: ['subquery']
+        });
+
+        assert.deepEqual(
+            $b.queryBuilder('getSQL', 'question_mark'),
+            subquery_sql,
+            'Should create SQL query with subquery'
+        );
+
+        $b.queryBuilder('reset');
+
+        $b.queryBuilder('setRulesFromSQL', subquery_sql, 'question_mark');
+
+        assert.rulesMatch(
+            $b.queryBuilder('getRules'),
+            subquery_sql,
+            'Should parse SQL query with subquery'
+        );
     });
 
     var subquery_filters = [{
@@ -93,6 +116,14 @@ $(function () {
                 }
             }]
         }
+    }, {
+        id: 'price',
+        label: 'Price',
+        type: 'double',
+        validation: {
+            min: 0,
+            step: 0.01
+        }
     }];
 
     var subquery_rules = {
@@ -114,7 +145,17 @@ $(function () {
                     value: 'ac'
                 }]
             }
+        }, {
+            id: 'price',
+            field: 'price',
+            operator: 'less',
+            value: 10.25
         }]
+    };
+
+    var subquery_sql = {
+        sql: 'subscriptions IN( SELECT id FROM subscriptions WHERE name LIKE(?) AND status = ? ) AND price < ?',
+        params: ['%Hello%', 'ac', 10.25]
     };
 
 });

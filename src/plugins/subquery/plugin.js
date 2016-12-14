@@ -45,6 +45,22 @@ QueryBuilder.define('subquery', function(options) {
         }
     });
 
+    // Build SQL text
+    this.on('ruleToSQL.filter', function(e, rule, value, sqlFn) {
+        var self = e.builder;
+        if (rule.type == 'subquery') {
+            e.value = self.getSubquerySql(e.value, rule);
+        }
+    });
+
+    // Build SQL values
+    this.on('ruleToSQLValues.filter', function(e, rule) {
+        var self = e.builder;
+        if (rule.type == 'subquery') {
+            e.value = self.getSubquerySqlValues(rule);
+        }
+    });
+
 });
 
 QueryBuilder.extend({
@@ -116,7 +132,9 @@ QueryBuilder.extend({
         }
         var $b = $('#' + rule.subquery_id);
         opts = $.extend({ validate: false }, opts);
-        return $b.queryBuilder('getRules', opts);
+        var value = $b.queryBuilder('getRules', opts);
+        value.subquery_id = rule.subquery_id;
+        return value;
     },
 
     /**
@@ -131,7 +149,41 @@ QueryBuilder.extend({
         }
         var $b = $('#' + rule.subquery_id);
         return $b.queryBuilder('setRules', value);
+    },
+
+    /**
+     * Gets the subquery SQL
+     * @param expression {string}
+     * @param rule {Rule}
+     * @param value {array}
+     * @return {object}
+     */
+    getSubquerySql: function (expression, rule, value) {
+        if (!('subquery_id' in rule.value)) {
+            Utils.error('subquery', 'Subquery id missing in "{0}" on getSubquerySql', rule.id);
+        }
+        var $b = $('#' + rule.value.subquery_id);
+        var sql = $b.queryBuilder('getSQL', 'question_mark').sql;
+        var basic = { condition: 'AND', rules: [ $.extend({}, rule) ] };
+        basic.rules[0].type = 'number';
+        basic.rules[0].value = 1;
+        var wrapper = this.getSQL('question_mark', false, basic);
+        return wrapper.sql.replace(/\?/, ' SELECT id FROM ' + rule.id + ' WHERE ' + sql + ' ');
+    },
+
+    /**
+     * Gets the subquery value as an array suitable for inclusion with the SQL
+     * @param rule {Rule}
+     * @return {object}
+     */
+    getSubquerySqlValues: function (rule) {
+        if (!('subquery_id' in rule.value)) {
+            Utils.error('subquery', 'Subquery id missing in "{0}" on getSubquerySqlValues', rule.id);
+        }
+        var $b = $('#' + rule.value.subquery_id);
+        return $b.queryBuilder('getSQL', 'question_mark').params;
     }
+
 
 });
 
