@@ -100,6 +100,11 @@ QueryBuilder.extend({
         var $b = $('#' + rule.subquery_id);
         $b.attr('data-subquery', rule.subquery_id);
         $b.queryBuilder(opts);
+        
+        $b.on('afterUpdateGroupCondition.queryBuilder', function(g,c) {		
+			c.$el.trigger('change')
+			});
+		
     },
 
     /**
